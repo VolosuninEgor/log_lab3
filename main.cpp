@@ -119,6 +119,16 @@ public:
             }
         }
     }
+        
+    bool containsPriority(int prio) const{
+        Node *f = head;
+        while (f != nullptr) {
+            if (f->priority == prio) return true;
+            f = f->next;
+        }
+        
+        return 0;
+    }
 
     void push(const std::string &str, int prio) {
         Node *current = new (std::nothrow) Node(str, prio);      
@@ -337,6 +347,10 @@ void menuQueuePrio() {
             std::cin >> s;
             std::cout << "приоритет: ";
             std::cin >> prio;
+            while (qp.containsPriority(prio)) {
+                std::cout << "ПРИОРИТЕТ ЗАНЯТ\nприоритет: ";
+                std::cin >> prio;
+            }
             qp.push(s, prio);
         } else if (cmd == 2) {
             qp.pop();
