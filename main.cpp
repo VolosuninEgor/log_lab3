@@ -1,5 +1,7 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
+#include <cctype>
 
 struct Node
 {
@@ -9,7 +11,6 @@ struct Node
 
     explicit Node(const std::string& str, int prio = 0) : inf(str), next(nullptr), priority(prio) {}
 };
-
 
 class List {
 private:
@@ -28,7 +29,6 @@ public:
             std::cout << "ОШИБКА ВЫДЕЛЕНИЯ ПАМЯТИ\n";
             return;
         }
-        
         if (head == nullptr) {
             head = p;
             last = p;
@@ -173,6 +173,45 @@ public:
             head = f;
         }
         last = nullptr;
+    }
+
+    bool strCmp(const std::string &str1, const std::string &str2){
+        if (str1.size() != str2.size()) return false;
+
+        return std::equal(str1.begin(), str1.end(), str2.begin(), [](unsigned char a, unsigned char b) {
+            return std::tolower(a) == std::tolower(b);
+        });
+    }
+
+    void del(const std::string &str){
+        int cnt = 0;
+        while (head != nullptr && strCmp(str, head->inf)) {
+            Node *f = head->next;
+            delete head;
+            head = f;
+        }
+
+        if (head == nullptr) {
+            last = nullptr;
+            return;
+        }
+        
+        Node *current = head->next;
+        Node *prev = head;
+        while (current != nullptr){
+            if (strCmp(current->inf, str)) {
+                
+                prev->next = current->next;
+                if (current == last) last = prev;
+                delete current;
+                current = prev->next;
+                ++cnt;
+            } else {
+                prev = current;
+                current = current->next;
+            }
+        }
+        std::cout << "удалено " << cnt << " элементов\n";
     }
 
     QueuePrio(const QueuePrio&) = delete;
@@ -336,7 +375,7 @@ void menuList() {
 void menuQueuePrio() {
     QueuePrio qp;
     int cmd = -1;
-    std::cout << "ОЧЕРЕДЬ С ПРИОРИТЕТОМ\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. меню\n0. назад\n";
+    std::cout << "ОЧЕРЕДЬ С ПРИОРИТЕТОМ\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. удаление по строке\n6. меню\n0. назад\n";
     while (cmd != 0) {
         std::cout << "пункт: ";
         if (!(std::cin >> cmd)) break;
@@ -359,6 +398,11 @@ void menuQueuePrio() {
         } else if (cmd == 4) {
             qp.clear();
         } else if (cmd == 5) {
+            std::string str;
+            std::cout << "введите строку для поиска и удаления совпадений:\n";
+            std::cin >> str;
+            qp.del(str);
+        } else if (cmd == 6) {
             std::cout << "ОЧЕРЕДЬ С ПРИОРИТЕТОМ\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. меню\n0. назад\n";
         } else if (cmd == 0) {
             break;
