@@ -2,6 +2,7 @@
 #include <string>
 #include <algorithm>
 #include <cctype>
+#include <vector>
 
 struct Node
 {
@@ -125,9 +126,8 @@ public:
         while (f != nullptr) {
             if (f->priority == prio) return true;
             f = f->next;
-        }
-        
-        return 0;
+        }    
+        return false;
     }
 
     void push(const std::string &str, int prio) {
@@ -189,6 +189,7 @@ public:
             Node *f = head->next;
             delete head;
             head = f;
+            ++cnt;
         }
 
         if (head == nullptr) {
@@ -200,7 +201,6 @@ public:
         Node *prev = head;
         while (current != nullptr){
             if (strCmp(current->inf, str)) {
-                
                 prev->next = current->next;
                 if (current == last) last = prev;
                 delete current;
@@ -285,14 +285,23 @@ public:
 class Stack {
 private:
     Node *head{nullptr};
+    int sizeS{0};
 public:
     Stack() = default;
 
     ~Stack() {
         clear();
     }
-
     
+    int size(){
+        return sizeS;
+    }
+    
+    bool empty() {
+        if (head == nullptr) return 1;
+        else return false;
+    }
+
     void review() const {
         if (head == nullptr) std::cout << "стек пустой\n";
         else {
@@ -318,14 +327,21 @@ public:
             current->next = head;
             head = current;
         }
+        ++sizeS;
     }
 
-    void pop() {
-        if (head == nullptr) std::cout << "стек пуст\n";
-        else {
+    std::string pop() {
+        std::string str;
+        if (head == nullptr) {
+            std::cout << "стек пуст\n";
+            return "";
+        } else {
+            str = head->inf;
             Node *current = head->next;
             delete head;
             head = current;
+            --sizeS;
+            return str;
         }
     }
 
@@ -335,6 +351,18 @@ public:
             delete head;
             head = f;
         }
+    }
+
+    void reverse() {
+        std::vector<std::string> v;
+        v.reserve(size());
+        int sz = size();
+        while(!empty()) v.push_back(pop());
+        for (int i = 0; i < sz; ++i) {
+             push(v[i]);
+        }
+
+        
     }
 
     Stack(const Stack&) = delete;
@@ -443,7 +471,7 @@ void menuQueue() {
 void menuStack() {
     Stack st;
     int cmd = -1;
-    std::cout << "СТЕК\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. меню\n0. назад\n";
+    std::cout << "СТЕК\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. переворот\n6. меню\n0. назад\n";
     while (cmd != 0) {
         std::cout << "пункт: ";
         if (!(std::cin >> cmd)) break;
@@ -459,6 +487,8 @@ void menuStack() {
         } else if (cmd == 4) {
             st.clear();
         } else if (cmd == 5) {
+            st.reverse();
+        } else if (cmd == 6) {
             std::cout << "СТЕК\n1. добавить\n2. извлечь\n3. просмотр\n4. очистить\n5. меню\n0. назад\n";
         } else if (cmd == 0) {
             break;
